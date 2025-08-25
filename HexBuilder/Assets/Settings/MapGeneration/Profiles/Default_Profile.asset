@@ -12,3 +12,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e40929b17214d9a4e8dc4e9b6a975a47, type: 3}
   m_Name: Default_Profile
   m_EditorClassIdentifier: 
+  width: 20
+  height: 20
+  seed: 24358
+  useRandomSeed: 1
+  outerRadius: 0.5
+  tileY: 0
+  noiseScale: 0.14
+  octaves: 4
+  persistence: 0.5
+  lacunarity: 2
+  noiseOffset: {x: 0, y: 0}
+  waterThreshold: 0.378
+  forestThreshold: 0.47
+  stoneThreshold: 0.626
+  grass: {fileID: 11400000, guid: 140e915c38d34934285231438d80bfbd, type: 2}
+  forest: {fileID: 11400000, guid: cc907fffa04be6b428bd05ba3c38a27b, type: 2}
+  stone: {fileID: 11400000, guid: 938fce5df8e67e74fb7c33a4817d39ef, type: 2}
+  water: {fileID: 11400000, guid: e91e523a5a0aebf479741235d6a4f13b, type: 2}

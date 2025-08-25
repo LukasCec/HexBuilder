@@ -12,3 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f4303781b51a344a8d61b4e66604ae4, type: 3}
   m_Name: Stone
   m_EditorClassIdentifier: 
+  displayName: Stone
+  material: {fileID: 2100000, guid: ffcfe6664e28e394d9e3eecd035ab3b4, type: 2}
+  buildable: 1
+  movementCost: 1
+  yieldWood: 0
+  yieldStone: 1
+  yieldWater: 0
+  propPrefab: {fileID: 4272926470839175450, guid: d91e674a769cd0445b6ca553ce223df7, type: 3}
+  propSpawnChance: 0.787
+  propHeightJitter: {x: 0, y: 0.05}
+  propScaleJitter: {x: 0.9, y: 1.1}
+  propYawJitter: {x: 0, y: 360}

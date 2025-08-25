@@ -12,3 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f4303781b51a344a8d61b4e66604ae4, type: 3}
   m_Name: Grass
   m_EditorClassIdentifier: 
+  displayName: Terrain
+  material: {fileID: 2100000, guid: 3231299576668c647a5f9121d761891a, type: 2}
+  buildable: 1
+  movementCost: 1
+  yieldWood: 1
+  yieldStone: 0
+  yieldWater: 0
+  propPrefab: {fileID: 0}
+  propSpawnChance: 0
+  propHeightJitter: {x: 0, y: 0.05}
+  propScaleJitter: {x: 0.9, y: 1.1}
+  propYawJitter: {x: 0, y: 360}

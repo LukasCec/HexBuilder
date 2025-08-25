@@ -12,3 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f4303781b51a344a8d61b4e66604ae4, type: 3}
   m_Name: Forest
   m_EditorClassIdentifier: 
+  displayName: Forest
+  material: {fileID: 2100000, guid: 64ab4bf540954b546a068106180b8a23, type: 2}
+  buildable: 1
+  movementCost: 1
+  yieldWood: 1
+  yieldStone: 0
+  yieldWater: 0
+  propPrefab: {fileID: 6874932951518319036, guid: 1e924c0a39f9f984fb773da5fff1ec5e, type: 3}
+  propSpawnChance: 1
+  propHeightJitter: {x: 0, y: 0.05}
+  propScaleJitter: {x: 0.9, y: 1.1}
+  propYawJitter: {x: 0, y: 360}
