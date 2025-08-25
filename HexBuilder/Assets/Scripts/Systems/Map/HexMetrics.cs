@@ -1,101 +1,84 @@
 using UnityEngine;
-using System;
 
 namespace HexBuilder.Systems.Map
 {
-  
     public static class HexMetrics
     {
-       
+        // VonkajöÌ polomer (stred -> vrchol)
         public static float OuterRadius = 0.5f;
-      
-        public static float InnerRadius => OuterRadius * 0.86602540378f;
 
-       
-        public static float CenterStepX => Mathf.Sqrt(3f) * OuterRadius;
-       
-        public static float CenterStepZ => 1.5f * OuterRadius;
+        // Vn˙torn˝ polomer (stred -> hrana) = R * sqrt(3)/2
+        public static float InnerRadius => OuterRadius * 0.8660254037844386f; // sqrt(3)/2
 
-       
+        // -------------------------------
+        //  POINTY-TOP KONVERZIE
+        // -------------------------------
+
+        // Axial (q,r) -> World (x,z)
+        // x = R*sqrt(3) * (q + r/2)
+        // z = R*3/2 * r
         public static Vector3 AxialToWorld(int q, int r, float y = 0f)
         {
-            float x = CenterStepX * (q + r * 0.5f);
-            float z = CenterStepZ * r;
+            float x = OuterRadius * 1.7320508075688772f * (q + r * 0.5f); // sqrt(3)
+            float z = OuterRadius * 1.5f * r;
             return new Vector3(x, y, z);
         }
 
-       
-        public static Vector2Int WorldToAxial(Vector3 worldPos)
+        // World (x,z) -> Axial (q,r) s presn˝m cube-zaokr˙hlenÌm
+        public static Vector2Int WorldToAxial(Vector3 world)
         {
-          
-            float size = OuterRadius;
-            float qf = (worldPos.x * Mathf.Sqrt(3f) / 3f - worldPos.z / 3f) / size;
-            float rf = (2f / 3f * worldPos.z) / size;
-
-           
-            var cube = FractionalAxialToCube(qf, rf);
-            var rounded = CubeRound(cube);
-            return new Vector2Int(rounded.q, rounded.r);
+            // analytick· inverzia k AxialToWorld (pointy-top)
+            float qf = (0.5773502691896258f * world.x - 0.3333333333333333f * world.z) / OuterRadius; // (sqrt(3)/3*x - 1/3*z)/R
+            float rf = (0.6666666666666666f * world.z) / OuterRadius;                                  // (2/3*z)/R
+            return RoundAxial(qf, rf);
         }
 
-       
-        public struct Cube
+        // -------------------------------
+        //  POMOCN… (kompatibilita s HexCoords)
+        // -------------------------------
+
+        // Axial -> Cube (x,y,z) kde x+y+z = 0
+        public static Vector3Int AxialToCube(int q, int r)
         {
-            public float x, y, z; 
-            public Cube(float x, float y, float z) { this.x = x; this.y = y; this.z = z; }
+            int x = q;
+            int z = r;
+            int y = -x - z;
+            return new Vector3Int(x, y, z);
         }
 
-        public struct Axial
+        // Cube -> Axial
+        public static Vector2Int CubeToAxial(Vector3Int cube)
         {
-            public int q, r;
-            public Axial(int q, int r) { this.q = q; this.r = r; }
+            return new Vector2Int(cube.x, cube.z);
         }
 
-        public static Cube AxialToCube(int q, int r)
+        // Zaokr˙hlenie cube s˙radnÌc (float) na najbliûöÌ platn˝ hex
+        public static Vector3Int CubeRound(float x, float y, float z)
         {
-           
-            return new Cube(q, -q - r, r);
-        }
+            int rx = Mathf.RoundToInt(x);
+            int ry = Mathf.RoundToInt(y);
+            int rz = Mathf.RoundToInt(z);
 
-        public static Axial CubeToAxial(Cube c)
-        {
-           
-            return new Axial(Mathf.RoundToInt(c.x), Mathf.RoundToInt(c.z));
-        }
+            float x_diff = Mathf.Abs(rx - x);
+            float y_diff = Mathf.Abs(ry - y);
+            float z_diff = Mathf.Abs(rz - z);
 
-        public static Cube FractionalAxialToCube(float qf, float rf)
-        {
-            float xf = qf;
-            float zf = rf;
-            float yf = -xf - zf;
-            return new Cube(xf, yf, zf);
-        }
-
-      
-        public static Axial CubeRound(Cube frac)
-        {
-            int rx = Mathf.RoundToInt(frac.x);
-            int ry = Mathf.RoundToInt(frac.y);
-            int rz = Mathf.RoundToInt(frac.z);
-
-            float dx = Mathf.Abs(rx - frac.x);
-            float dy = Mathf.Abs(ry - frac.y);
-            float dz = Mathf.Abs(rz - frac.z);
-
-            if (dx > dy && dx > dz)
-            {
+            if (x_diff > y_diff && x_diff > z_diff)
                 rx = -ry - rz;
-            }
-            else if (dy > dz)
-            {
+            else if (y_diff > z_diff)
                 ry = -rx - rz;
-            }
             else
-            {
                 rz = -rx - ry;
-            }
 
-            return new Axial(rx, rz); 
+            return new Vector3Int(rx, ry, rz);
+        }
+
+        // Zaokr˙hlenie axial (float) pomocou cube-roundingu
+        public static Vector2Int RoundAxial(float qf, float rf)
+        {
+            // preveÔ na cube, zaokr˙hli, sp‰ù na axial
+            var cube = CubeRound(qf, -qf - rf, rf);
+            return CubeToAxial(cube);
         }
     }
 }

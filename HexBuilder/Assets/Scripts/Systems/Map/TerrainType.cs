@@ -10,6 +10,10 @@ namespace HexBuilder.Systems.Map
         public bool buildable = true;      
         [Range(0, 10)] public int movementCost = 1;
 
+        [Header("Visual")]
+        [Tooltip("Lokálny y-offset pre tento terén (záporné = nižšie).")]
+        public float heightOffsetY = 0f;
+
         [Header("Base yields per tile (optional)")]
         public int yieldWood = 0;
         public int yieldStone = 0;

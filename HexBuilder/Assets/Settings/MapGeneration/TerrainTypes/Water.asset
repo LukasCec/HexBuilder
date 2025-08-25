@@ -16,6 +16,7 @@ MonoBehaviour:
   material: {fileID: 2100000, guid: 5a26a2321aa32eb4895cfc1d29fe7f05, type: 2}
   buildable: 0
   movementCost: 1
+  heightOffsetY: -0.05
   yieldWood: 0
   yieldStone: 0
   yieldWater: 1
