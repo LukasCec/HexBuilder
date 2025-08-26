@@ -19,5 +19,8 @@ namespace HexBuilder.Systems.Map
             if (!meshRenderer) meshRenderer = GetComponentInChildren<MeshRenderer>();
             if (meshRenderer && t && t.material) meshRenderer.sharedMaterial = t.material;
         }
+
+        [System.NonSerialized] public HexBuilder.Systems.Buildings.BuildingInstance occupant;
+        public bool IsOccupied => occupant != null;
     }
 }
