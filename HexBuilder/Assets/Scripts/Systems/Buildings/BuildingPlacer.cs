@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 #endif
 using HexBuilder.Systems.Map;
+using HexBuilder.Systems.Resources;
 
 namespace HexBuilder.Systems.Buildings
 {
@@ -19,7 +20,10 @@ namespace HexBuilder.Systems.Buildings
         public Color validTint = new Color(0.4f, 1f, 0.4f, 0.6f);
         public Color invalidTint = new Color(1f, 0.3f, 0.3f, 0.6f);
 
-       
+        [Header("Resources")]
+        public ResourceInventory inventory;
+
+
         public bool buildMode { get; private set; }
         public BuildingType activeType { get; private set; }
         GameObject ghost;
@@ -31,6 +35,7 @@ namespace HexBuilder.Systems.Buildings
         {
             if (!cam) cam = Camera.main;
             if (tilesMask == 0) tilesMask = LayerMask.GetMask("Tiles");
+            if (!inventory) inventory = FindObjectOfType<ResourceInventory>();
 
             if (!buildingsParent)
             {
@@ -44,11 +49,13 @@ namespace HexBuilder.Systems.Buildings
             if (!buildMode || activeType == null) return;
             if (!cam) cam = Camera.main;
 
-          
-            HexTile tile = GetTileUnderMouse(out Vector3 hitPos);
-            bool valid = tile && IsValidPlacement(tile);
 
-          
+            HexTile tile = GetTileUnderMouse(out Vector3 hitPos);
+            bool tileValid = tile && IsValidPlacement(tile);
+            bool canPay = (inventory == null || activeType == null) ? true : inventory.CanAfford(activeType);
+            bool valid = tileValid && canPay;
+
+
             EnsureGhost();
             if (ghost)
             {
@@ -120,11 +127,16 @@ namespace HexBuilder.Systems.Buildings
         void Place(HexTile tile)
         {
             if (!tile || !activeType) return;
+            if (inventory && activeType && !inventory.CanAfford(activeType))
+            {
+                Debug.Log("[Build] Not enough resources.");
+                return;
+            }
 
             var pos = tile.transform.position + activeType.localOffset;
             pos.y += activeType.yOffset;
             var rot = Quaternion.Euler(activeType.defaultRotationEuler + new Vector3(0f, ghostYaw, 0f));
-
+            inventory?.Pay(activeType);
             var go = Instantiate(activeType.prefab, pos, rot, buildingsParent);
             var inst = go.GetComponent<BuildingInstance>();
             if (!inst) inst = go.AddComponent<BuildingInstance>();
