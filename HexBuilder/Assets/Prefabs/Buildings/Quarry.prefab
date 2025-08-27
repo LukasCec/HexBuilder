@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 1200246441834938403}
   - component: {fileID: 4304981195575799650}
   - component: {fileID: 9151179604917320761}
+  - component: {fileID: 917220398778482668}
+  - component: {fileID: 4260009064552661968}
   m_Layer: 0
   m_Name: Quarry
   m_TagString: Untagged
@@ -108,3 +110,35 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &917220398778482668
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3264502659654063117}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df58e0d0bcb9d9b43b279f6a91822172, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: {fileID: 0}
+  coords:
+    q: 0
+    r: 0
+  tile: {fileID: 0}
+--- !u!114 &4260009064552661968
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3264502659654063117}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f77a28e9abd4474c8ede94ce9c58974, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseStone: 1
+  perAdjacentStone: 1
+  maxPerTick: 5

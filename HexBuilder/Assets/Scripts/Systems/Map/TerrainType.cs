@@ -5,6 +5,7 @@ namespace HexBuilder.Systems.Map
     [CreateAssetMenu(fileName = "TerrainType", menuName = "HexBuilder/Terrain Type", order = 0)]
     public class TerrainType : ScriptableObject
     {
+        public string id = "forest";
         public string displayName = "Terrain";
         public Material material;         
         public bool buildable = true;      

@@ -23,9 +23,14 @@ namespace HexBuilder.Systems.Map
         [Tooltip("Rotate each tile around Y when instantiating. Use 30 for pointy-top if your model is flat-top.")]
         public float rotationY = 30f;
 
-        // Index hexdlaždíc podľa súradníc (string kľúč: "q,r")
-        public static readonly Dictionary<string, HexTile> TileIndex = new Dictionary<string, HexTile>();
+        // --- DVA indexy (kompatibilita so starším kódom) ---
+        // 1) Podľa koordinátov (rýchle a bezpečné)
+        public static readonly Dictionary<HexCoords, HexTile> TileIndex = new();
+        // 2) Podľa string kľúča "q,r" (ak to niekde používaš)
+        public static readonly Dictionary<string, HexTile> TileIndexByKey = new();
+
         public static string Key(HexCoords c) => $"{c.q},{c.r}";
+        public static string Key(int q, int r) => $"{q},{r}";
 
         static Vector2 SeedToNoiseOffset(int s)
         {
@@ -42,20 +47,26 @@ namespace HexBuilder.Systems.Map
             if (!mapRoot) { Debug.LogError("[Gen] Missing mapRoot"); return; }
             if (!decorRoot) decorRoot = mapRoot;
 
-            // Clear
+            // Clear scene children (ponechaj DecorRoot)
             if (decorRoot)
+            {
                 for (int i = decorRoot.childCount - 1; i >= 0; i--)
                     DestroyImmediate(decorRoot.GetChild(i).gameObject);
+            }
 
             if (mapRoot)
+            {
                 for (int i = mapRoot.childCount - 1; i >= 0; i--)
                 {
                     var child = mapRoot.GetChild(i);
                     if (decorRoot && child == decorRoot) continue;
                     DestroyImmediate(child.gameObject);
                 }
+            }
 
+            // Clear indexy
             TileIndex.Clear();
+            TileIndexByKey.Clear();
 
             // Metrics
             HexMetrics.OuterRadius = profile.outerRadius;
@@ -75,7 +86,7 @@ namespace HexBuilder.Systems.Map
             int waterCnt = 0, grassCnt = 0, forestCnt = 0, stoneCnt = 0;
             float minH = 1f, maxH = 0f;
 
-            // Generate
+            // Generate grid
             for (int r = 0; r < profile.height; r++)
             {
                 for (int q = 0; q < profile.width; q++)
@@ -95,8 +106,9 @@ namespace HexBuilder.Systems.Map
                     tile.coords = coords;
                     tile.meshRenderer = go.GetComponentInChildren<MeshRenderer>();
 
-                    // index
-                    TileIndex[Key(coords)] = tile;
+                    // --- uloženie do OBOCH indexov ---
+                    TileIndex[coords] = tile;
+                    TileIndexByKey[Key(coords)] = tile;
 
                     // noise
                     float h = profile.FBm(coords.q + seedOffset.x, coords.r + seedOffset.y);
@@ -154,7 +166,12 @@ namespace HexBuilder.Systems.Map
             int totalTiles = profile.width * profile.height;
             Debug.Log($"[Gen] Done. Seed={seed}, tiles={totalTiles}, R={HexMetrics.OuterRadius}, rotY={rotationY}° | " +
                       $"noise min={minH:F2} max={maxH:F2} | water={waterCnt} grass={grassCnt} forest={forestCnt} stone={stoneCnt}");
-            Debug.Log($"[Gen] TileIndex.Count={TileIndex.Count}");
+            Debug.Log($"[Gen] TileIndex.Count={TileIndex.Count}, TileIndexByKey.Count={TileIndexByKey.Count}");
+
+            int cq = 0, cr = 0; // stred je často okolie (0,0)
+            bool byKey = TileIndexByKey.ContainsKey($"{cq},{cr}");
+            bool byVal = TileIndex.ContainsKey(new HexCoords(cq, cr));
+            Debug.Log($"[Gen] Index check (0,0): byKey={byKey} byVal={byVal}");
         }
     }
 }

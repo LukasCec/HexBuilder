@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 7350687447547486049}
   - component: {fileID: 1809079854624612735}
   - component: {fileID: 603075237919132998}
+  - component: {fileID: 3606153340884070753}
+  - component: {fileID: 4212552258910152886}
   m_Layer: 0
   m_Name: LumberCamp
   m_TagString: Untagged
@@ -110,3 +112,35 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
+--- !u!114 &3606153340884070753
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3629514712284789940}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df58e0d0bcb9d9b43b279f6a91822172, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: {fileID: 0}
+  coords:
+    q: 0
+    r: 0
+  tile: {fileID: 0}
+--- !u!114 &4212552258910152886
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3629514712284789940}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae863ff187516334c8aaac2d833ea127, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseWood: 0
+  woodPerAdjacentForest: 1
+  maxPerTick: 6
