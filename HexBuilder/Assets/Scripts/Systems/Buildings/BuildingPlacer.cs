@@ -142,10 +142,10 @@ namespace HexBuilder.Systems.Buildings
             if (!inst) inst = go.AddComponent<BuildingInstance>();
             inst.Bind(activeType, tile);
 
-           
 
-           
-           
+
+
+
         }
 
         void EnsureGhost(bool forceRecreate = false)

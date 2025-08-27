@@ -19,5 +19,5 @@ MonoBehaviour:
   yOffset: 0
   localOffset: {x: 0, y: 0, z: 0}
   defaultRotationEuler: {x: 0, y: 0, z: 0}
-  costWood: 0
-  costStone: 0
+  costWood: 20
+  costStone: 10

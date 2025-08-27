@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f4303781b51a344a8d61b4e66604ae4, type: 3}
   m_Name: Water
   m_EditorClassIdentifier: 
-  displayName: Terrain
+  id: water
+  displayName: Water
   material: {fileID: 2100000, guid: 5a26a2321aa32eb4895cfc1d29fe7f05, type: 2}
   buildable: 0
   movementCost: 1

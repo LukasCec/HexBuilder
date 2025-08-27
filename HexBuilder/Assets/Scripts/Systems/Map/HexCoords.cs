@@ -25,22 +25,22 @@ namespace HexBuilder.Systems.Map
         public static HexCoords operator +(HexCoords a, HexCoords b) => new HexCoords(a.q + b.q, a.r + b.r);
         public static HexCoords operator -(HexCoords a, HexCoords b) => new HexCoords(a.q - b.q, a.r - b.r);
 
-      
-        public static readonly HexCoords[] Directions = new HexCoords[]
-        {
-            new HexCoords(+1, 0),   // E
-            new HexCoords(+1, -1),  // NE
-            new HexCoords(0, -1),   // NW
-            new HexCoords(-1, 0),   // W
-            new HexCoords(-1, +1),  // SW
-            new HexCoords(0, +1),   // SE
-        };
 
+          private static readonly HexCoords[] directions = new HexCoords[]
+         {
+            new HexCoords(+1,  0),
+            new HexCoords(+1, -1),
+            new HexCoords( 0, -1),
+            new HexCoords(-1,  0),
+            new HexCoords(-1, +1),
+            new HexCoords( 0, +1),
+         };
         public HexCoords Neighbor(int dir)
         {
-            dir = Mathf.FloorToInt(Mathf.Repeat(dir, 6));
-            return this + Directions[dir];
+            var d = directions[dir % 6];
+            return new HexCoords(q + d.q, r + d.r);
         }
+
 
         public static int Distance(HexCoords a, HexCoords b)
         {
