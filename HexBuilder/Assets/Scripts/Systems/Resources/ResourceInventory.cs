@@ -13,7 +13,24 @@ namespace HexBuilder.Systems.Resources
 
         public event Action OnChanged;
 
-       
+
+        public bool CanAffordMove(HexBuilder.Systems.Buildings.BuildingType t, float rate = 0.2f)
+        {
+            if (t == null) return false;
+            int w = Mathf.CeilToInt(t.costWood * rate);
+            int s = Mathf.CeilToInt(t.costStone * rate);
+            return wood >= w && stone >= s;
+        }
+
+        
+        public void PayMove(HexBuilder.Systems.Buildings.BuildingType t, float rate = 0.2f)
+        {
+            if (t == null) return;
+            wood -= Mathf.CeilToInt(t.costWood * rate);
+            stone -= Mathf.CeilToInt(t.costStone * rate);
+            NotifyChanged();
+        }
+
         public bool CanAfford(HexBuilder.Systems.Buildings.BuildingType t)
         {
             if (t == null) return false;

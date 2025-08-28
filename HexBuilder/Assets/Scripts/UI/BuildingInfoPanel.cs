@@ -18,6 +18,8 @@ namespace HexBuilder.UI
 
         [Header("Actions")]
         public Button demolishButton;
+        public BuildingPlacer placer;
+
         [Range(0f, 1f)]
         public float refundPercent = 0.5f;
         public HexBuilder.Systems.Resources.ResourceInventory inventory;
@@ -122,6 +124,14 @@ namespace HexBuilder.UI
 
             current.Demolish(inventory, refundPercent);
             Hide();
+        }
+        public void OnMoveClick()
+        {
+            if (placer != null && current != null)
+            {
+                placer.EnterMoveMode(current);
+                
+            }
         }
     }
 }

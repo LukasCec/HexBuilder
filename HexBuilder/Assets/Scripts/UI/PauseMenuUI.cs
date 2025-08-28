@@ -17,7 +17,11 @@ namespace HexBuilder.UI
         [Header("Save/Load deps")]
         public BuildingTypeRegistry registry;
         public HexMapGenerator generator;       
-        public Transform buildingsParent;      
+        public Transform buildingsParent;
+
+
+        [Header("Gameplay refs")]
+        public BuildingPlacer placer;
 
         void Awake()
         {
@@ -29,6 +33,10 @@ namespace HexBuilder.UI
         {
             if (EscapePressed())
             {
+                if (placer != null && placer.HandleEscapeFromModes())
+                    return;
+
+               
                 if (panel) panel.SetActive(!panel.activeSelf);
                 Time.timeScale = panel && panel.activeSelf ? 0f : 1f;
             }
