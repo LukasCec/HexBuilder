@@ -5,7 +5,7 @@ using HexBuilder.Systems.Core;
 
 namespace HexBuilder.Systems.Buildings
 {
-    /// Base pre akéko¾vek „živé“ správanie budovy.
+    
     [RequireComponent(typeof(BuildingInstance))]
     public abstract class BuildingBehaviour : MonoBehaviour
     {
@@ -25,7 +25,7 @@ namespace HexBuilder.Systems.Buildings
             if (instance == null || instance.tile == null || inventory == null)
                 return;
 
-            // ak by profil nebol vyriešený, skús to ešte raz
+            
             if (profile == null)
             {
                 var gen = FindObjectOfType<HexBuilder.Systems.Map.HexMapGenerator>();
@@ -38,7 +38,7 @@ namespace HexBuilder.Systems.Buildings
 
         protected abstract void OnTick();
 
-        // --- helpers ---
+        
 
         protected void TryResolveRefs()
         {
@@ -54,16 +54,15 @@ namespace HexBuilder.Systems.Buildings
 
         protected HexTile GetTileAt(HexCoords c)
         {
-            // 1) string index "q,r"
+           
             if (HexBuilder.Systems.Map.HexMapGenerator.TileIndexByKey.TryGetValue($"{c.q},{c.r}", out var t1))
                 return t1;
 
-            // 2) value-type index
+            
             if (HexBuilder.Systems.Map.HexMapGenerator.TileIndex.TryGetValue(c, out var t2))
                 return t2;
 
-            // 3) pomalý fallback – prebehni existujúce HexTile v scéne
-            //    (6 susedov × O(N) je úplne v pohode)
+            
             var all = Object.FindObjectsOfType<HexBuilder.Systems.Map.HexTile>();
             for (int i = 0; i < all.Length; i++)
             {
@@ -72,10 +71,19 @@ namespace HexBuilder.Systems.Buildings
             }
             return null;
         }
+        public HexBuilder.Systems.Map.HexTile[] GetNeighborsForUI()
+        {
+            return GetNeighborsRing1();
+        }
+
+        
+        public HexBuilder.Systems.Map.MapGenerationProfile GetProfile()
+        {
+            return profile;
+        }
 
 
-
-        /// Vráti 6 susedov (mimo mapy môže vraca null).
+       
         protected HexTile[] GetNeighborsRing1()
         {
             var res = new HexTile[6];

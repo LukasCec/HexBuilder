@@ -10,6 +10,9 @@ namespace HexBuilder.Systems.Buildings
         public string displayName = "Building";
         public GameObject prefab;
 
+        [TextArea(2, 5)]
+        public string description = "";
+
         [Tooltip("Na akıch terénoch je povolené stava.")]
         public List<HexBuilder.Systems.Map.TerrainType> allowedTerrains = new();
 

@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   displayName: Qarry
   prefab: {fileID: 3264502659654063117, guid: 1fdef0cbf821c6942bf0d491207ea793, type: 3}
+  description: Mines stone from adjescent tiles.
   allowedTerrains:
   - {fileID: 11400000, guid: 938fce5df8e67e74fb7c33a4817d39ef, type: 2}
   yOffset: 0

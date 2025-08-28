@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 9151179604917320761}
   - component: {fileID: 917220398778482668}
   - component: {fileID: 4260009064552661968}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Quarry
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -140,5 +140,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseStone: 1
-  perAdjacentStone: 1
+  stonePerAdjacentRock: 1
   maxPerTick: 5

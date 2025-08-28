@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   displayName: Well
   prefab: {fileID: 3629514712284789940, guid: 12d67f7143f143246b2e8c98cbc25027, type: 3}
+  description: Draws water from adjescent tiles.
   allowedTerrains:
   - {fileID: 11400000, guid: 140e915c38d34934285231438d80bfbd, type: 2}
   yOffset: 0
