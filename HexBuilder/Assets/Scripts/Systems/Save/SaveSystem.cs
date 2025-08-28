@@ -38,6 +38,16 @@ namespace HexBuilder.Systems.Save
                 data.resources.water = wa;
             }
 
+            var cycle = Object.FindObjectOfType<HexBuilder.Visual.DayNightCycle>();
+            if (cycle != null)
+            {
+                data.dayNight.timeOfDay = cycle.GetTimeOfDay();
+            }
+            else
+            {
+                data.dayNight.timeOfDay = 0.25f; // fallback poludnie
+            }
+
             foreach (var b in buildings)
             {
                 if (!b || b.type == null) continue;
@@ -82,7 +92,13 @@ namespace HexBuilder.Systems.Save
            
             gen.GenerateFromSeed(data.seed);
 
-           
+            var cycle = Object.FindObjectOfType<HexBuilder.Visual.DayNightCycle>();
+            if (cycle != null)
+            {
+                cycle.SetTimeOfDay(data.dayNight != null ? data.dayNight.timeOfDay : 0.25f);
+            }
+
+
             var exist = Object.FindObjectsOfType<BuildingInstance>();
             foreach (var e in exist) Object.Destroy(e.gameObject);
 
