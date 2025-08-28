@@ -27,5 +27,14 @@ namespace HexBuilder.Systems.Save
         public int seed;
         public SaveResources resources = new SaveResources();
         public List<SaveBuilding> buildings = new List<SaveBuilding>();
+        public SaveDayNight dayNight = new SaveDayNight();
     }
+
+    [System.Serializable]
+    public class SaveDayNight
+    {
+        public float timeOfDay; 
+    }
+
+    
 }
