@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 603075237919132998}
   - component: {fileID: 3606153340884070753}
   - component: {fileID: 4212552258910152886}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LumberCamp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -144,3 +144,4 @@ MonoBehaviour:
   baseWood: 0
   woodPerAdjacentForest: 1
   maxPerTick: 6
+  debugNeighbors: 1

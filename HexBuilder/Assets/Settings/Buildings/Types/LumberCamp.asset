@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   displayName: LumberCamp
   prefab: {fileID: 3629514712284789940, guid: f44849cece34a3b40aff0fb0359520ee, type: 3}
+  description: Chops wood from adjescent tiles.
   allowedTerrains:
   - {fileID: 11400000, guid: 140e915c38d34934285231438d80bfbd, type: 2}
   yOffset: 0

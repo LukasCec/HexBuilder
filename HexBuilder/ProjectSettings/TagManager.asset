@@ -12,7 +12,7 @@ TagManager:
   - Water
   - UI
   - Tiles
-  - 
+  - Buildings
   - 
   - 
   - 
@@ -48,5 +48,5 @@ TagManager:
   - Light Layer 3
   - Light Layer 4
   - Light Layer 5
-  - Light Layer 6
+  - Outline
   - Light Layer 7
