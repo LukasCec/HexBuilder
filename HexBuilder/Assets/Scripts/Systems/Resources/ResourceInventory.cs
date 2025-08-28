@@ -9,11 +9,11 @@ namespace HexBuilder.Systems.Resources
         [Header("Starting resources")]
         public int wood = 50;
         public int stone = 30;
-        public int water = 0;   // zatia¾ ho len zobrazujeme (náklady máme wood/stone)
+        public int water = 0;  
 
         public event Action OnChanged;
 
-        // --- API ---
+       
         public bool CanAfford(HexBuilder.Systems.Buildings.BuildingType t)
         {
             if (t == null) return false;
@@ -43,6 +43,52 @@ namespace HexBuilder.Systems.Resources
             }
             NotifyChanged();
         }
+
+        public (int wood, int stone, int water) GetAll()
+        {
+            int wood = GetAmount("wood");  
+            int stone = GetAmount("stone");
+            int water = GetAmount("water");
+            return (wood, stone, water);
+        }
+
+        public void SetAll(int wood, int stone, int water)
+        {
+            SetAmount("wood", wood);  
+            SetAmount("stone", stone);
+            SetAmount("water", water);
+        }
+
+
+        public int GetAmount(string id)
+        {
+            switch (id.ToLowerInvariant())
+            {
+                case "wood": return wood;
+                case "stone": return stone;
+                case "water": return water;
+                default:
+                    Debug.LogWarning($"[Inventory] Unknown resource id '{id}'. Use wood/stone/water.");
+                    return 0;
+            }
+        }
+
+        public void SetAmount(string id, int value)
+        {
+            switch (id.ToLowerInvariant())
+            {
+                case "wood": wood = value; break;
+                case "stone": stone = value; break;
+                case "water": water = value; break;
+                default:
+                    Debug.LogWarning($"[Inventory] Unknown resource id '{id}'. Use wood/stone/water.");
+                    return;
+            }
+            NotifyChanged();
+        }
+
+
+
 
         public void NotifyChanged() => OnChanged?.Invoke();
     }

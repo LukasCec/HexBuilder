@@ -6,6 +6,10 @@ namespace HexBuilder.Systems.Buildings
     [CreateAssetMenu(menuName = "HexBuilder/Building Type", fileName = "NewBuildingType")]
     public class BuildingType : ScriptableObject
     {
+        [Header("ID")]
+        [Tooltip("Jedineèný string (napr. 'lumber', 'well', 'quarry'). Používa sa v savoch.")]
+        public string id = "unset";
+
         [Header("Basics")]
         public string displayName = "Building";
         public GameObject prefab;

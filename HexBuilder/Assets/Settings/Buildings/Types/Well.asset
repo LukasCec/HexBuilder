@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 343ee79180d097c40a8327f5a24b391c, type: 3}
   m_Name: Well
   m_EditorClassIdentifier: 
+  id: well
   displayName: Well
   prefab: {fileID: 3629514712284789940, guid: 12d67f7143f143246b2e8c98cbc25027, type: 3}
   description: Draws water from adjescent tiles.

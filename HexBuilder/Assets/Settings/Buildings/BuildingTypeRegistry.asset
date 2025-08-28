@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60e91560b6d68c04496eaf3d9b90b120, type: 3}
+  m_Name: BuildingTypeRegistry
+  m_EditorClassIdentifier: 
+  entries:
+  - id: house
+    type: {fileID: 11400000, guid: 0a52fdd0641e0dd4fa5cc1f770abb585, type: 2}
+  - id: lumber
+    type: {fileID: 11400000, guid: 20dca779a16bf984c8c6ce28cec2afb2, type: 2}
+  - id: quarry
+    type: {fileID: 11400000, guid: f009c758ac6951a49afe0ec719191752, type: 2}
+  - id: well
+    type: {fileID: 11400000, guid: 0bc3e9d43ca971448a3d53e08fe2b9fd, type: 2}
