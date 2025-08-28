@@ -23,10 +23,11 @@ namespace HexBuilder.Systems.Map
         [Tooltip("Rotate each tile around Y when instantiating. Use 30 for pointy-top if your model is flat-top.")]
         public float rotationY = 30f;
 
-        // --- DVA indexy (kompatibilita so starším kódom) ---
-        // 1) Podľa koordinátov (rýchle a bezpečné)
+        public int lastSeed { get; private set; } = 0;
+
+        
         public static readonly Dictionary<HexCoords, HexTile> TileIndex = new();
-        // 2) Podľa string kľúča "q,r" (ak to niekde používaš)
+       
         public static readonly Dictionary<string, HexTile> TileIndexByKey = new();
 
         public static string Key(HexCoords c) => $"{c.q},{c.r}";
@@ -39,15 +40,35 @@ namespace HexBuilder.Systems.Map
             return new Vector2(x, y);
         }
 
+        // ----------------- PUBLIC API -----------------
+
         [ContextMenu("Generate Map")]
         public void Generate()
         {
             if (!profile) { Debug.LogError("[Gen] Missing profile"); return; }
+            int seed = profile.useRandomSeed
+                ? (Environment.TickCount ^ DateTime.Now.Ticks.GetHashCode())
+                : profile.seed;
+
+            GenerateInternal(seed);
+        }
+
+       
+        public void GenerateFromSeed(int seed)
+        {
+            if (!profile) { Debug.LogError("[GenFromSeed] Missing profile"); return; }
+            GenerateInternal(seed);
+        }
+
+        // ----------------- INTERNAL CORE -----------------
+
+        void GenerateInternal(int seed)
+        {
             if (!tilePrefab) { Debug.LogError("[Gen] Missing tilePrefab"); return; }
             if (!mapRoot) { Debug.LogError("[Gen] Missing mapRoot"); return; }
             if (!decorRoot) decorRoot = mapRoot;
 
-            // Clear scene children (ponechaj DecorRoot)
+           
             if (decorRoot)
             {
                 for (int i = decorRoot.childCount - 1; i >= 0; i--)
@@ -64,21 +85,19 @@ namespace HexBuilder.Systems.Map
                 }
             }
 
-            // Clear indexy
+           
             TileIndex.Clear();
             TileIndexByKey.Clear();
 
-            // Metrics
+            
             HexMetrics.OuterRadius = profile.outerRadius;
 
-            // Seed
-            int seed = profile.useRandomSeed
-                ? (Environment.TickCount ^ DateTime.Now.Ticks.GetHashCode())
-                : profile.seed;
+          
+            lastSeed = seed;
             UnityEngine.Random.InitState(seed);
             Vector2 seedOffset = SeedToNoiseOffset(seed);
 
-            // Prep
+           
             Quaternion rot = Quaternion.Euler(0f, rotationY, 0f);
             int qOffset = profile.width / 2;
             int rOffset = profile.height / 2;
@@ -86,7 +105,7 @@ namespace HexBuilder.Systems.Map
             int waterCnt = 0, grassCnt = 0, forestCnt = 0, stoneCnt = 0;
             float minH = 1f, maxH = 0f;
 
-            // Generate grid
+           
             for (int r = 0; r < profile.height; r++)
             {
                 for (int q = 0; q < profile.width; q++)
@@ -106,16 +125,16 @@ namespace HexBuilder.Systems.Map
                     tile.coords = coords;
                     tile.meshRenderer = go.GetComponentInChildren<MeshRenderer>();
 
-                    // --- uloženie do OBOCH indexov ---
+                   
                     TileIndex[coords] = tile;
                     TileIndexByKey[Key(coords)] = tile;
 
-                    // noise
+                   
                     float h = profile.FBm(coords.q + seedOffset.x, coords.r + seedOffset.y);
                     minH = Mathf.Min(minH, h);
                     maxH = Mathf.Max(maxH, h);
 
-                    // terrain
+                   
                     TerrainType tt;
                     if (h <= profile.waterThreshold) tt = profile.water;
                     else if (h >= profile.stoneThreshold) tt = profile.stone;
@@ -124,7 +143,7 @@ namespace HexBuilder.Systems.Map
 
                     tile.ApplyTerrain(tt);
 
-                    // per-terrain Y offset
+                   
                     if (tt != null && Mathf.Abs(tt.heightOffsetY) > 0.0001f)
                     {
                         var p = go.transform.position;
@@ -132,7 +151,7 @@ namespace HexBuilder.Systems.Map
                         go.transform.position = p;
                     }
 
-                    // water bob
+                  
                     if (tt == profile.water)
                     {
                         var wb = go.GetComponent<WaterBob>() ?? go.AddComponent<WaterBob>();
@@ -140,7 +159,7 @@ namespace HexBuilder.Systems.Map
                         wb.Initialize(baseY, -0.12f, -0.05f, 0.08f, 0.18f);
                     }
 
-                    // counts
+                    
                     if (tt == profile.water) waterCnt++;
                     else if (tt == profile.stone) stoneCnt++;
                     else if (tt == profile.forest) forestCnt++;
@@ -164,13 +183,13 @@ namespace HexBuilder.Systems.Map
             }
 
             int totalTiles = profile.width * profile.height;
-            Debug.Log($"[Gen] Done. Seed={seed}, tiles={totalTiles}, R={HexMetrics.OuterRadius}, rotY={rotationY}° | " +
+            Debug.Log($"[Gen] Done. Seed={lastSeed}, tiles={totalTiles}, R={HexMetrics.OuterRadius}, rotY={rotationY}° | " +
                       $"noise min={minH:F2} max={maxH:F2} | water={waterCnt} grass={grassCnt} forest={forestCnt} stone={stoneCnt}");
             Debug.Log($"[Gen] TileIndex.Count={TileIndex.Count}, TileIndexByKey.Count={TileIndexByKey.Count}");
 
-            int cq = 0, cr = 0; // stred je často okolie (0,0)
-            bool byKey = TileIndexByKey.ContainsKey($"{cq},{cr}");
-            bool byVal = TileIndex.ContainsKey(new HexCoords(cq, cr));
+           
+            bool byKey = TileIndexByKey.ContainsKey("0,0");
+            bool byVal = TileIndex.ContainsKey(new HexCoords(0, 0));
             Debug.Log($"[Gen] Index check (0,0): byKey={byKey} byVal={byVal}");
         }
     }

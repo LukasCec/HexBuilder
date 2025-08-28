@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 343ee79180d097c40a8327f5a24b391c, type: 3}
   m_Name: House
   m_EditorClassIdentifier: 
+  id: house
   displayName: House
   prefab: {fileID: 8863046962474784771, guid: 4788a2196c94d434c890ea5d0e90c85d, type: 3}
   description: Home for your people.

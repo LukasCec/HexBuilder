@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 343ee79180d097c40a8327f5a24b391c, type: 3}
   m_Name: LumberCamp
   m_EditorClassIdentifier: 
+  id: lumber
   displayName: LumberCamp
   prefab: {fileID: 3629514712284789940, guid: f44849cece34a3b40aff0fb0359520ee, type: 3}
   description: Chops wood from adjescent tiles.

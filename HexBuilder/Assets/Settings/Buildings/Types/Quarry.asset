@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 343ee79180d097c40a8327f5a24b391c, type: 3}
   m_Name: Quarry
   m_EditorClassIdentifier: 
+  id: quarry
   displayName: Qarry
   prefab: {fileID: 3264502659654063117, guid: 1fdef0cbf821c6942bf0d491207ea793, type: 3}
   description: Mines stone from adjescent tiles.
