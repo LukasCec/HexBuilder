@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 using HexBuilder.Systems.Buildings;
 
 namespace HexBuilder.UI
@@ -13,16 +14,32 @@ namespace HexBuilder.UI
         public TMP_Text nameText;
         public TMP_Text coordsText;
         public TMP_Text prodText;
-        public TMP_Text descText;   
+        public TMP_Text descText;
+
+        [Header("Actions")]
+        public Button demolishButton;
+        [Range(0f, 1f)]
+        public float refundPercent = 0.5f;
+        public HexBuilder.Systems.Resources.ResourceInventory inventory;
+
+        BuildingInstance current;
 
         void Awake()
         {
             if (!root) root = gameObject;
             Hide();
+
+            if (demolishButton)
+                demolishButton.onClick.AddListener(OnClickDemolish);
+
+            if (!inventory)
+                inventory = FindObjectOfType<HexBuilder.Systems.Resources.ResourceInventory>();
+
         }
 
         public void Show(BuildingInstance inst)
         {
+            current = inst;
             if (!inst || inst.type == null)
             {
                 Hide();
@@ -88,12 +105,23 @@ namespace HexBuilder.UI
 
             if (prodText) prodText.text = prod;
 
+            if (demolishButton) demolishButton.interactable = true;
+
             root.SetActive(true);
         }
 
         public void Hide()
         {
+            current = null;
             if (root) root.SetActive(false);
+        }
+
+        void OnClickDemolish()
+        {
+            if (!current) return;
+
+            current.Demolish(inventory, refundPercent);
+            Hide();
         }
     }
 }
