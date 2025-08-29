@@ -4,6 +4,7 @@ using HexBuilder.Systems.Map;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
+using UnityEngine.EventSystems;
 
 namespace HexBuilder.UI
 {
@@ -26,8 +27,6 @@ namespace HexBuilder.UI
         void Awake()
         {
             if (!cam) cam = Camera.main;
-
-            // Ak nie je nastavené v Inspectore, nastavíme defaultné masky pod¾a názvu vrstiev.
             if (buildingsMask == 0) buildingsMask = LayerMask.GetMask("Buildings");
             if (tilesMask == 0) tilesMask = LayerMask.GetMask("Tiles");
         }
@@ -37,6 +36,9 @@ namespace HexBuilder.UI
             if (!LeftClickDown()) return;
             if (!cam) cam = Camera.main;
             if (!cam) return;
+
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+                return;
 
             Vector2 mpos = GetMousePos();
             Ray ray = cam.ScreenPointToRay(mpos);
@@ -63,7 +65,7 @@ namespace HexBuilder.UI
                 }
             }
 
-            // 3) Klik do prázdna -> skry panel.
+           
             infoPanel?.Hide();
         }
 

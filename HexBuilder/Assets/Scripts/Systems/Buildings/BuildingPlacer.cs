@@ -1,9 +1,10 @@
-using UnityEngine;
+﻿using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
 using HexBuilder.Systems.Map;
 using HexBuilder.Systems.Resources;
+using UnityEngine.EventSystems;
 
 namespace HexBuilder.Systems.Buildings
 {
@@ -54,12 +55,20 @@ namespace HexBuilder.Systems.Buildings
         void Update()
         {
             if (currentMode == Mode.None) return;
-            if (!cam) cam = Camera.main;
 
-            HexTile tile = GetTileUnderMouse(out Vector3 hitPos);
+            // nepracuj so svetom, keď je kurzor nad UI
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+                return;
+
+            if (!cam) cam = Camera.main;
+            if (!cam) return;
+
+            // ⬇️ deklaruj raz
+            Vector3 hitPos;
+            HexTile tile = GetTileUnderMouse(out hitPos);
             bool hasTile = tile != null;
 
-           
+            // validita dlaždice + affordability
             bool tileValid = hasTile && IsValidPlacement(tile);
             bool canPay = true;
 
@@ -74,7 +83,7 @@ namespace HexBuilder.Systems.Buildings
 
             bool valid = tileValid && canPay;
 
-         
+            // ghost
             EnsureGhost();
             if (ghost)
             {
@@ -94,26 +103,25 @@ namespace HexBuilder.Systems.Buildings
                 TintGhost(valid ? validTint : invalidTint);
             }
 
-          
+            // rotácia ghostu
             if (KeyDown(KeyCode.Q)) ghostYaw -= 60f;
             if (KeyDown(KeyCode.E)) ghostYaw += 60f;
 
-          
+            // potvrdenie
             if (LeftClickDown() && valid)
             {
-                if (currentMode == Mode.Build)
-                    PlaceNew(tile);
-                else if (currentMode == Mode.Move)
-                    MoveExisting(tile);
+                if (currentMode == Mode.Build) PlaceNew(tile);
+                else if (currentMode == Mode.Move) MoveExisting(tile);
             }
 
-          
+            // cancel
             if (KeyDown(KeyCode.Escape))
             {
                 ExitBuildMode();
                 ExitMoveMode();
             }
         }
+
 
         // ---------- Public API ----------
         public void EnterBuildMode(BuildingType type)
