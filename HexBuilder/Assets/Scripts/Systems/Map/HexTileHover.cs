@@ -11,8 +11,8 @@ namespace HexBuilder.Systems.Map
         public float returnSpeed = 10f;
 
         [Header("Outline")]
-        public OutlineOverlay overlayPrefab;           // OutlineOverlay.prefab
-        public Transform overlayParent;                // nastav na /_Bootstrap/MapRoot (alebo nechaj pr·zdne)
+        public OutlineOverlay overlayPrefab;
+        public Transform overlayParent;
         public Color hoverColor = new Color(1f, 0.9f, 0.4f, 1f);
         public Color buildableColor = new Color(0.3f, 1f, 0.3f, 1f);
         public Color blockedColor = new Color(1f, 0.3f, 0.3f, 1f);
@@ -25,8 +25,17 @@ namespace HexBuilder.Systems.Map
         bool hovered;
         bool canLift = true;
 
+        // --- NEW: refs na tile a prÌpadnÈho ìoccupantaî (budovu) ---
+        HexTile tile;
+        HexBuilder.Systems.Buildings.BuildingInstance hoveredOccupant;
+        Transform originalOccupantParent;
+
+        bool pendingDetach = false;
+
         void Awake()
         {
+            tile = GetComponent<HexTile>();
+
             baseY = transform.position.y;
             targetY = baseY;
 
@@ -36,7 +45,7 @@ namespace HexBuilder.Systems.Map
                 if (gen) overlayParent = gen.mapRoot;
             }
 
-            // vodu nech·me nezdvÌhaù (m· WaterBob)
+            // vodu nezdvÌhame (m· WaterBob)
             if (GetComponent<WaterBob>() != null)
                 canLift = false;
         }
@@ -50,16 +59,12 @@ namespace HexBuilder.Systems.Map
                 return;
             }
 
-            // D‘LEéIT…: inötancuj pod overlayParent (napr. MapRoot), nie pod tile
             Transform parent = overlayParent ? overlayParent : transform.parent;
             overlayInst = Instantiate(overlayPrefab, parent);
-
-            // nastav tvar/öt˝l
             overlayInst.radiusScale = radiusScale;
             overlayInst.SetWidth(lineWidth);
             overlayInst.UpdatePoints();
 
-            // prvotnÈ umiestnenie a rot·cia zodpovedaj˙ca tile
             SyncOverlayTransform();
         }
 
@@ -67,19 +72,19 @@ namespace HexBuilder.Systems.Map
         {
             if (!overlayInst) return;
 
-            // drû outline v strede tile, ale na zemi (baseY), s rovnakou Y-rot·ciou ako tile
             var pos = transform.position;
-            pos.y = baseY;  // nezodvihne sa s tile
+            pos.y = baseY; // outline ost·va na zemi
             overlayInst.transform.position = pos;
 
             var rot = overlayInst.transform.rotation.eulerAngles;
-            rot.y = transform.rotation.eulerAngles.y;   // rovnakÈ natoËenie
+            rot.y = transform.rotation.eulerAngles.y;
             overlayInst.transform.rotation = Quaternion.Euler(rot.x, rot.y, rot.z);
-            overlayInst.transform.localScale = Vector3.one; // bez dedenia scale
+            overlayInst.transform.localScale = Vector3.one;
         }
 
         public void SetHovered(bool isHovered, bool? buildable = null)
         {
+            if (hovered == isHovered) return;
             hovered = isHovered;
 
             if (isHovered)
@@ -90,43 +95,84 @@ namespace HexBuilder.Systems.Map
                     var c = buildable.HasValue ? (buildable.Value ? buildableColor : blockedColor) : hoverColor;
                     overlayInst.SetColor(c);
                     overlayInst.gameObject.SetActive(true);
-                    SyncOverlayTransform(); // hneÔ zos˙ladiù polohu/rot·ciu
+                    SyncOverlayTransform();
+                }
+
+                if (canLift)
+                {
+                    AttachOccupant();            // pripn˙ù hneÔ
+                    pendingDetach = false;       // ruöÌme prÌpadnÈ Ëakanie na odpojenie
+                    targetY = baseY + liftHeight;
                 }
             }
             else
             {
                 if (overlayInst) overlayInst.gameObject.SetActive(false);
-            }
 
-            if (canLift)
-                targetY = baseY + (hovered ? liftHeight : 0f);
+                if (canLift)
+                {
+                    targetY = baseY;
+                    // NEodpojuj teraz ñ poËk·me, k˝m dlaûdica dosadne v Update()
+                    pendingDetach = true;
+                }
+            }
         }
 
         void Update()
         {
-            // zdvih/vrat
             if (canLift)
             {
                 var p = transform.position;
                 float speed = hovered ? liftSpeed : returnSpeed;
                 p.y = Mathf.Lerp(p.y, targetY, Time.deltaTime * speed);
                 transform.position = p;
+
+                
+                if (!hovered && pendingDetach && Mathf.Abs(transform.position.y - baseY) < 0.001f)
+                {
+                    DetachOccupant();
+                    pendingDetach = false;
+                }
             }
 
-            // outline drû na zemi a v strede tile aj poËas pohybu
             if (overlayInst && overlayInst.gameObject.activeSelf)
-            {
                 SyncOverlayTransform();
-            }
         }
 
-        // ak by sa poËas regener·cie menil base Y, mÙûeö zavolaù
         public void ResetBaseY(float newBaseY)
         {
             baseY = newBaseY;
             targetY = baseY;
             var p = transform.position; p.y = baseY; transform.position = p;
             SyncOverlayTransform();
+        }
+
+        // --- NEW: helpery na pripnutie/odpojenie occupanta (budovy) ---
+        void AttachOccupant()
+        {
+            if (!tile) tile = GetComponent<HexTile>();
+            var occ = tile ? tile.occupant : null;
+            if (!occ) return;
+            if (hoveredOccupant == occ) return;
+
+            hoveredOccupant = occ;
+            originalOccupantParent = occ.transform.parent;
+            occ.transform.SetParent(transform, worldPositionStays: true);
+        }
+
+        void DetachOccupant()
+        {
+            if (!hoveredOccupant) return;
+            hoveredOccupant.transform.SetParent(originalOccupantParent, worldPositionStays: true);
+            hoveredOccupant = null;
+            originalOccupantParent = null;
+        }
+
+        void OnDisable()
+        {
+            pendingDetach = false;
+            if (hovered) { hovered = false; targetY = baseY; }
+            DetachOccupant();
         }
     }
 }

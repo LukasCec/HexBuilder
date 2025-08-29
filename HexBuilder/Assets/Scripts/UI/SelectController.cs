@@ -1,5 +1,6 @@
 using UnityEngine;
 using HexBuilder.Systems.Buildings;
+using HexBuilder.Systems.Map;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -15,41 +16,56 @@ namespace HexBuilder.UI
         [Header("Raycast")]
         [Tooltip("Max. vzdialenosù raycastu pri kliku.")]
         public float maxRayDistance = 2000f;
-        [Tooltip("Voliteæne obmedz raycast na konkrÈtne vrstvy (napr. Buildings/Tiles). 0 = vöetko.")]
-        public LayerMask hitMask = 0;
+
+        [Tooltip("Maska pre budovy (Layer \"Buildings\"). Ak nenech·ö, doplnÌ sa automaticky.")]
+        public LayerMask buildingsMask;
+
+        [Tooltip("Maska pre dlaûdice (Layer \"Tiles\"). Ak nenech·ö, doplnÌ sa automaticky.")]
+        public LayerMask tilesMask;
 
         void Awake()
         {
             if (!cam) cam = Camera.main;
+
+            // Ak nie je nastavenÈ v Inspectore, nastavÌme defaultnÈ masky podæa n·zvu vrstiev.
+            if (buildingsMask == 0) buildingsMask = LayerMask.GetMask("Buildings");
+            if (tilesMask == 0) tilesMask = LayerMask.GetMask("Tiles");
         }
 
         void Update()
         {
-            if (LeftClickDown())
+            if (!LeftClickDown()) return;
+            if (!cam) cam = Camera.main;
+            if (!cam) return;
+
+            Vector2 mpos = GetMousePos();
+            Ray ray = cam.ScreenPointToRay(mpos);
+
+            // 1) Najprv sk˙sime trafiù budovu (Buildings).
+            if (Physics.Raycast(ray, out var hitB, maxRayDistance, buildingsMask, QueryTriggerInteraction.Ignore))
             {
-                Vector2 mpos = GetMousePos();
-                if (cam == null) cam = Camera.main;
-                if (cam == null) return;
-
-                Ray ray = cam.ScreenPointToRay(mpos);
-                RaycastHit hit;
-
-                bool didHit = (hitMask.value == 0)
-                    ? Physics.Raycast(ray, out hit, maxRayDistance)
-                    : Physics.Raycast(ray, out hit, maxRayDistance, hitMask, QueryTriggerInteraction.Ignore);
-
-                if (didHit)
+                var inst = hitB.collider.GetComponentInParent<BuildingInstance>();
+                if (inst != null)
                 {
-                    var inst = hit.collider.GetComponentInParent<BuildingInstance>();
-                    if (inst != null && infoPanel != null)
-                    {
-                        infoPanel.Show(inst);
-                    }
+                    infoPanel?.Show(inst);
+                    return;
                 }
             }
-        }
 
-       
+            // 2) Fallback: sk˙sime trafiù dlaûdicu (Tiles) a z nej occupant budovu.
+            if (Physics.Raycast(ray, out var hitT, maxRayDistance, tilesMask, QueryTriggerInteraction.Ignore))
+            {
+                var tile = hitT.collider.GetComponentInParent<HexTile>();
+                if (tile != null && tile.occupant != null)
+                {
+                    infoPanel?.Show(tile.occupant);
+                    return;
+                }
+            }
+
+            // 3) Klik do pr·zdna -> skry panel.
+            infoPanel?.Hide();
+        }
 
         bool LeftClickDown()
         {
