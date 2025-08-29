@@ -2,6 +2,8 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using HexBuilder.Systems.Buildings;
+using HexBuilder.Systems.Map;
+using UnityEngine.EventSystems;
 
 namespace HexBuilder.UI
 {
@@ -132,20 +134,28 @@ namespace HexBuilder.UI
             if (root) root.SetActive(false);
         }
 
-        void OnClickDemolish()
+        public void OnClickDemolish()
         {
             if (!current) return;
-
             current.Demolish(inventory, refundPercent);
             Hide();
         }
+
+
         public void OnMoveClick()
         {
-            if (placer != null && current != null)
+            if (!current) return;
+
+            if (placer == null)
+                placer = FindObjectOfType<BuildingPlacer>();
+            if (placer == null)
             {
-                placer.EnterMoveMode(current);
-                
+                Debug.LogWarning("[InfoPanel] BuildingPlacer nebol nájdený.");
+                return;
             }
+
+            placer.EnterMoveMode(current);
+            Hide();
         }
     }
 }

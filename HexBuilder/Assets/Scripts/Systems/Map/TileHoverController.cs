@@ -2,13 +2,14 @@ using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
+using UnityEngine.EventSystems;
 
 namespace HexBuilder.Systems.Map
 {
     public class TileHoverController : MonoBehaviour
     {
-        public Camera cam;                  // priraï, alebo nechaj prázdne -> Camera.main
-        public LayerMask tilesMask;         // nastav na Layer "Tiles"
+        public Camera cam;
+        public LayerMask tilesMask;     
         public float maxDistance = 1000f;
 
         HexTileHover current;
@@ -23,6 +24,21 @@ namespace HexBuilder.Systems.Map
         {
             if (!cam) cam = Camera.main;
             if (!cam) return;
+
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+            {
+                if (current) current.SetHovered(false);
+                current = null;
+                return;
+            }
+
+
+            if (HexTileHover.GlobalSuspend)
+            {
+                if (current) current.SetHovered(false);
+                current = null;
+                return;
+            }
 
             Vector2 mousePos;
 #if ENABLE_INPUT_SYSTEM
@@ -41,7 +57,6 @@ namespace HexBuilder.Systems.Map
                     current = hover;
                     if (current)
                     {
-                        // volite¾ná farba pod¾a buildability
                         bool buildable = current.GetComponent<HexTile>()?.terrain?.buildable ?? true;
                         current.SetHovered(true, buildable);
                     }
