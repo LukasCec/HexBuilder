@@ -142,9 +142,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae863ff187516334c8aaac2d833ea127, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseWood: 0
+  upkeepWoodEveryNTicks: 0
+  upkeepStoneEveryNTicks: 0
+  upkeepWaterEveryNTicks: 5
+  baseWood: 1
   woodPerAdjacentForest: 1
-  maxPerTick: 6
+  maxPerTick: 4
   debugNeighbors: 1
 --- !u!1 &4990845456610229333
 GameObject:

@@ -15,6 +15,7 @@ namespace HexBuilder.UI
         public TMP_Text coordsText;
         public TMP_Text prodText;
         public TMP_Text descText;
+        public TMP_Text statusText;
 
         [Header("Actions")]
         public Button demolishButton;
@@ -107,7 +108,20 @@ namespace HexBuilder.UI
 
             if (prodText) prodText.text = prod;
 
-            if (demolishButton) demolishButton.interactable = true;
+            if (statusText)
+            {
+                if (beh != null && beh.PausedForUpkeep)
+                {
+                    string reason = beh.PauseReason;
+                    statusText.text = $"Status: Paused (No {reason})";
+                }
+                else
+                {
+                    statusText.text = "Status: Running";
+                }
+            }
+
+                if (demolishButton) demolishButton.interactable = true;
 
             root.SetActive(true);
         }

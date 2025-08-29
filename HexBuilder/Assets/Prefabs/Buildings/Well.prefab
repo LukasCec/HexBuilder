@@ -263,6 +263,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 445ff861965cc82448e888f234073292, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseWater: 0
+  upkeepWoodEveryNTicks: 0
+  upkeepStoneEveryNTicks: 6
+  upkeepWaterEveryNTicks: 0
+  baseWater: 1
   waterPerAdjacentWater: 1
   maxPerTick: 3

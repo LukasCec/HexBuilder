@@ -1,11 +1,10 @@
-using UnityEngine;
+﻿using UnityEngine;
 using HexBuilder.Systems.Map;
 using HexBuilder.Systems.Resources;
 using HexBuilder.Systems.Core;
 
 namespace HexBuilder.Systems.Buildings
 {
-    
     [RequireComponent(typeof(BuildingInstance))]
     public abstract class BuildingBehaviour : MonoBehaviour
     {
@@ -13,6 +12,19 @@ namespace HexBuilder.Systems.Buildings
         protected ResourceInventory inventory;
         protected TickManager ticks;
         protected MapGenerationProfile profile;
+
+        // ===== Periodic Upkeep (every N ticks; 0 = disabled) =====
+        [Header("Upkeep (every N ticks; 0 = disabled)")]
+        [Tooltip("Consumes 1 wood each N ticks (0 = none).")]
+        public int upkeepWoodEveryNTicks = 0;
+        [Tooltip("Consumes 1 stone each N ticks (0 = none).")]
+        public int upkeepStoneEveryNTicks = 0;
+        [Tooltip("Consumes 1 water each N ticks (0 = none).")]
+        public int upkeepWaterEveryNTicks = 0;
+
+        int upkeepTickCounter = 0;
+        public bool PausedForUpkeep { get; private set; }
+        public string PauseReason { get; private set; }
 
         protected virtual void Awake() { TryResolveRefs(); }
         protected virtual void OnEnable() { TryResolveRefs(); if (ticks) ticks.OnTick += OnTickSafe; }
@@ -25,21 +37,55 @@ namespace HexBuilder.Systems.Buildings
             if (instance == null || instance.tile == null || inventory == null)
                 return;
 
-            
             if (profile == null)
             {
-                var gen = FindObjectOfType<HexBuilder.Systems.Map.HexMapGenerator>();
+                var gen = FindObjectOfType<HexMapGenerator>();
                 if (gen) profile = gen.profile;
                 if (profile == null) return;
             }
 
+            upkeepTickCounter++;
+            if (!HandleUpkeepThisTick())
+                return; // paused this tick
+
             OnTick();
+        }
+
+        bool HandleUpkeepThisTick()
+        {
+            int needWood = (upkeepWoodEveryNTicks > 0 && (upkeepTickCounter % upkeepWoodEveryNTicks == 0)) ? 1 : 0;
+            int needStone = (upkeepStoneEveryNTicks > 0 && (upkeepTickCounter % upkeepStoneEveryNTicks == 0)) ? 1 : 0;
+            int needWater = (upkeepWaterEveryNTicks > 0 && (upkeepTickCounter % upkeepWaterEveryNTicks == 0)) ? 1 : 0;
+
+            if (needWood == 0 && needStone == 0 && needWater == 0)
+            {
+                PausedForUpkeep = false;
+                PauseReason = null;
+                return true;
+            }
+
+            if (needWood > 0 && inventory.GetAmount("wood") < needWood) { Pause("No wood"); return false; }
+            if (needStone > 0 && inventory.GetAmount("stone") < needStone) { Pause("No stone"); return false; }
+            if (needWater > 0 && inventory.GetAmount("water") < needWater) { Pause("No water"); return false; }
+
+            if (needWood > 0) inventory.TryConsume("wood", needWood);
+            if (needStone > 0) inventory.TryConsume("stone", needStone);
+            if (needWater > 0) inventory.TryConsume("water", needWater);
+
+            PausedForUpkeep = false;
+            PauseReason = null;
+            return true;
+        }
+
+        void Pause(string reason)
+        {
+            PausedForUpkeep = true;
+            PauseReason = reason;
         }
 
         protected abstract void OnTick();
 
-        
-
+        // --- helpers ---
         protected void TryResolveRefs()
         {
             if (!instance) instance = GetComponent<BuildingInstance>();
@@ -54,36 +100,18 @@ namespace HexBuilder.Systems.Buildings
 
         protected HexTile GetTileAt(HexCoords c)
         {
-           
-            if (HexBuilder.Systems.Map.HexMapGenerator.TileIndexByKey.TryGetValue($"{c.q},{c.r}", out var t1))
+            if (HexMapGenerator.TileIndexByKey.TryGetValue($"{c.q},{c.r}", out var t1))
                 return t1;
-
-            
-            if (HexBuilder.Systems.Map.HexMapGenerator.TileIndex.TryGetValue(c, out var t2))
+            if (HexMapGenerator.TileIndex.TryGetValue(c, out var t2))
                 return t2;
 
-            
-            var all = Object.FindObjectsOfType<HexBuilder.Systems.Map.HexTile>();
+            var all = Object.FindObjectsOfType<HexTile>();
             for (int i = 0; i < all.Length; i++)
-            {
-                if (all[i] != null && all[i].coords.q == c.q && all[i].coords.r == c.r)
+                if (all[i] && all[i].coords.q == c.q && all[i].coords.r == c.r)
                     return all[i];
-            }
             return null;
         }
-        public HexBuilder.Systems.Map.HexTile[] GetNeighborsForUI()
-        {
-            return GetNeighborsRing1();
-        }
 
-        
-        public HexBuilder.Systems.Map.MapGenerationProfile GetProfile()
-        {
-            return profile;
-        }
-
-
-       
         protected HexTile[] GetNeighborsRing1()
         {
             var res = new HexTile[6];
@@ -97,5 +125,9 @@ namespace HexBuilder.Systems.Buildings
             }
             return res;
         }
+
+        // Pre UI
+        public HexTile[] GetNeighborsForUI() => GetNeighborsRing1();
+        public MapGenerationProfile GetProfile() => profile;
     }
 }
