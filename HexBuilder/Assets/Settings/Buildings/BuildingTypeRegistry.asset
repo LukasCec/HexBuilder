@@ -21,3 +21,5 @@ MonoBehaviour:
     type: {fileID: 11400000, guid: f009c758ac6951a49afe0ec719191752, type: 2}
   - id: well
     type: {fileID: 11400000, guid: 0bc3e9d43ca971448a3d53e08fe2b9fd, type: 2}
+  - id: warehouse
+    type: {fileID: 11400000, guid: beaaab22ca11c2d48ba1f97cd9aa673e, type: 2}

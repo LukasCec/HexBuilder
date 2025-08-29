@@ -14,30 +14,36 @@ namespace HexBuilder.UI
         public TMP_Text stoneText;
         public TMP_Text waterText;
 
-        void OnEnable()
+        void Awake()
         {
             if (!inventory) inventory = FindObjectOfType<ResourceInventory>();
-            if (inventory != null) inventory.OnChanged += UpdateUI;
-            UpdateUI();
+        }
+
+        void OnEnable()
+        {
+
+            if (inventory) inventory.OnChanged += Refresh;
+            Refresh();
         }
 
         void OnDisable()
         {
-            if (inventory != null) inventory.OnChanged -= UpdateUI;
+            if(inventory) inventory.OnChanged -= Refresh;
         }
 
         void Start()
         {
-            
-            UpdateUI();
+
+            Refresh();
         }
 
-        public void UpdateUI()
+        public void Refresh()
         {
             if (!inventory) return;
-            if (woodText) woodText.text = inventory.wood.ToString();
-            if (stoneText) stoneText.text = inventory.stone.ToString();
-            if (waterText) waterText.text = inventory.water.ToString();
+
+            if (woodText) woodText.text = $"{inventory.wood}/{inventory.maxWood}";
+            if (stoneText) stoneText.text = $"{inventory.stone}/{inventory.maxStone}";
+            if (waterText) waterText.text = $"{inventory.water}/{inventory.maxWater}";
         }
     }
 }

@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 343ee79180d097c40a8327f5a24b391c, type: 3}
+  m_Name: Warehouse
+  m_EditorClassIdentifier: 
+  id: warehouse
+  displayName: Warehouse
+  prefab: {fileID: 3264502659654063117, guid: 3916e289506500f4e8365560c051952c, type: 3}
+  description: Increases storage capacity for wood and stone.
+  allowedTerrains:
+  - {fileID: 11400000, guid: 140e915c38d34934285231438d80bfbd, type: 2}
+  - {fileID: 11400000, guid: cc907fffa04be6b428bd05ba3c38a27b, type: 2}
+  - {fileID: 11400000, guid: 938fce5df8e67e74fb7c33a4817d39ef, type: 2}
+  yOffset: 0
+  localOffset: {x: 0, y: 0, z: 0}
+  defaultRotationEuler: {x: 0, y: 0, z: 0}
+  costWood: 40
+  costStone: 20

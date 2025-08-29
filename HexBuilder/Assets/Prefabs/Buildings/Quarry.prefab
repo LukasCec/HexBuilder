@@ -140,9 +140,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f77a28e9abd4474c8ede94ce9c58974, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  upkeepWoodEveryNTicks: 4
+  upkeepStoneEveryNTicks: 0
+  upkeepWaterEveryNTicks: 0
   baseStone: 1
   stonePerAdjacentRock: 1
-  maxPerTick: 5
+  maxPerTick: 3
 --- !u!1 &7966456668708975603
 GameObject:
   m_ObjectHideFlags: 0
