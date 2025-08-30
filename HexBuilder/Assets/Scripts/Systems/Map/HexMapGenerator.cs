@@ -156,7 +156,7 @@ namespace HexBuilder.Systems.Map
                     {
                         var wb = go.GetComponent<WaterBob>() ?? go.AddComponent<WaterBob>();
                         float baseY = go.transform.position.y;
-                        wb.Initialize(baseY, -0.12f, -0.05f, 0.08f, 0.18f);
+                        wb.Initialize(baseY, -0.16f, -0.05f, 0.3f, 0.6f);
                     }
 
                     
