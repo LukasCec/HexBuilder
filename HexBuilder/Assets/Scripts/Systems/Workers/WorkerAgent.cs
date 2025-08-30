@@ -13,25 +13,25 @@ namespace HexBuilder.Systems.Workers
     {
         public string workerName = "Worker";
         public int carryCapacity = 6;
-        public float moveSpeed = 3.0f; // units/sec (svetové jednotky)
+        public float moveSpeed = 3.0f; 
         public float arriveThreshold = 0.05f;
 
-        // stav
+       
         public enum State { Idle, ToSource, Loading, ToDest, Unloading }
         public State CurrentState { get; private set; } = State.Idle;
 
-        // cargo
+       
         public string carryingId = null;
         public int carryingAmount = 0;
 
-        // job
+       
         PickupDeliverJob job;
 
-        // path
+      
         List<HexCoords> path = new List<HexCoords>();
         int pathIndex = 0;
 
-        // refs
+       
         MapGenerationProfile profile;
 
         void Start()
@@ -67,21 +67,21 @@ namespace HexBuilder.Systems.Workers
                     break;
             }
         }
-       
 
 
-        // ------------- Flow -------------
+
+        
         void TryClaimJob()
         {
-            if (JobBoard.Instance == null) return;
-            var j = JobBoard.Instance.TryClaimJob();
+            if (WorkerManager.Instance == null) return;
+            var j = WorkerManager.Instance.TryClaimJobFor(this);
             if (j == null) return;
 
             job = j;
             carryingId = null;
             carryingAmount = 0;
 
-            if (!PlanPathTo(job.source)) { JobBoard.Instance.InvalidateJob(job); job = null; return; }
+            if (!PlanPathTo(job.source)) { AbortJob(); return; }
             CurrentState = State.ToSource;
         }
 
@@ -121,7 +121,7 @@ namespace HexBuilder.Systems.Workers
             if (job == null || job.dest == null) { AbortJob(); return; }
             if (string.IsNullOrEmpty(carryingId) || carryingAmount <= 0) { CompleteOrInvalidate(); return; }
 
-            // vlož do globálneho inventory (sklad má v sebe inventory ref)
+           
             var inv = job.dest.GetComponentInParent<ResourceInventory>();
             if (!inv) inv = FindObjectOfType<ResourceInventory>();
             if (!inv) { AbortJob(); return; }
@@ -129,9 +129,12 @@ namespace HexBuilder.Systems.Workers
             inv.Add(carryingId, carryingAmount);
             carryingId = null; carryingAmount = 0;
 
+            if (WorkerManager.Instance != null && job != null)
+                WorkerManager.Instance.NotifyRelease(this, job.resourceId);
+
             if (job.amount > 0)
             {
-                // ešte ostalo v jobe → späť k source po ďalší náklad
+               
                 if (!PlanPathTo(job.source)) { AbortJob(); return; }
                 CurrentState = State.ToSource;
             }
@@ -145,16 +148,23 @@ namespace HexBuilder.Systems.Workers
 
         void CompleteOrInvalidate()
         {
+            if (job != null && WorkerManager.Instance != null)
+                WorkerManager.Instance.NotifyRelease(this, job.resourceId);
+
             if (job == null) { CurrentState = State.Idle; return; }
             if (job.amount <= 0) JobBoard.Instance.CompleteJob(job);
             else JobBoard.Instance.InvalidateJob(job);
             job = null; CurrentState = State.Idle;
         }
 
+
         void AbortJob()
         {
-            if (job != null && JobBoard.Instance != null)
-                JobBoard.Instance.InvalidateJob(job);
+            if (job != null)
+            {
+                if (JobBoard.Instance != null) JobBoard.Instance.InvalidateJob(job);
+                if (WorkerManager.Instance != null) WorkerManager.Instance.NotifyRelease(this, job.resourceId);
+            }
             job = null;
             carryingId = null; carryingAmount = 0;
             CurrentState = State.Idle;
@@ -202,7 +212,7 @@ namespace HexBuilder.Systems.Workers
 
         HexTile FindClosestTileUnderMe()
         {
-            // najjednoduchšie: nájdi najbližší tile podľa world pozície
+           
             HexTile best = null;
             float bestDist = float.MaxValue;
             foreach (var kv in HexMapGenerator.TileIndexByKey)
