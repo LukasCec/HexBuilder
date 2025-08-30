@@ -140,12 +140,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c20e0ab407bc704c8243c51eda16a20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  upkeepWood: 0
-  upkeepStone: 0
-  upkeepWater: 0
+  upkeepWoodEveryNTicks: 0
+  upkeepStoneEveryNTicks: 0
+  upkeepWaterEveryNTicks: 0
   addMaxWood: 50
   addMaxStone: 50
   addMaxWater: 0
+  useWorkers: 1
+  jobsPerTick: 10
+  serviceRadius: 10
+  pullPerTick: 8
 --- !u!1 &7966456668708975603
 GameObject:
   m_ObjectHideFlags: 0

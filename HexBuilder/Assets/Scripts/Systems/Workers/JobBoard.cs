@@ -50,6 +50,18 @@ namespace HexBuilder.Systems.Workers
             return null;
         }
 
+        public int CountPending(string resourceId)
+        {
+            int n = 0;
+            for (int i = 0; i < jobs.Count; i++)
+            {
+                var j = jobs[i];
+                if (j.status == JobStatus.Pending && j.resourceId == resourceId)
+                    n += j.amount; 
+            }
+            return n;
+        }
+
         public void CompleteJob(PickupDeliverJob job)
         {
             if (job == null) return;
