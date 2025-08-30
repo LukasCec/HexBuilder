@@ -48,7 +48,8 @@ namespace HexBuilder.Systems.Buildings
             }
 
             int amount = Mathf.Clamp(baseStone + adjStone * stonePerAdjacentRock, 0, maxPerTick);
-            if (amount > 0) inventory.Add("stone", amount);
+            if (amount > 0)
+                AddToOutput("stone", amount);
         }
     }
 }

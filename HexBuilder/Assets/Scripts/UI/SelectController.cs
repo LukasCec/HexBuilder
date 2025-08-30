@@ -5,6 +5,7 @@ using HexBuilder.Systems.Map;
 using UnityEngine.InputSystem;
 #endif
 using UnityEngine.EventSystems;
+using HexBuilder.Systems.Workers;
 
 namespace HexBuilder.UI
 {
@@ -24,11 +25,17 @@ namespace HexBuilder.UI
         [Tooltip("Maska pre dlaûdice (Layer \"Tiles\"). Ak nenech·ö, doplnÌ sa automaticky.")]
         public LayerMask tilesMask;
 
+        [Tooltip("Maska pre jednotky (Layer \"Units\").")]
+        public LayerMask unitsMask;
+
+
         void Awake()
         {
             if (!cam) cam = Camera.main;
             if (buildingsMask == 0) buildingsMask = LayerMask.GetMask("Buildings");
             if (tilesMask == 0) tilesMask = LayerMask.GetMask("Tiles");
+            if (unitsMask == 0) unitsMask = LayerMask.GetMask("Units");
+
         }
 
         void Update()
@@ -43,7 +50,17 @@ namespace HexBuilder.UI
             Vector2 mpos = GetMousePos();
             Ray ray = cam.ScreenPointToRay(mpos);
 
-            // 1) Najprv sk˙sime trafiù budovu (Buildings).
+            if (Physics.Raycast(ray, out var hitU, maxRayDistance, unitsMask, QueryTriggerInteraction.Ignore))
+            {
+                var w = hitU.collider.GetComponentInParent<WorkerAgent>();
+                if (w)
+                {
+                    infoPanel?.Show(w);     
+                    return;
+                }
+            }
+
+
             if (Physics.Raycast(ray, out var hitB, maxRayDistance, buildingsMask, QueryTriggerInteraction.Ignore))
             {
                 var inst = hitB.collider.GetComponentInParent<BuildingInstance>();
@@ -54,7 +71,7 @@ namespace HexBuilder.UI
                 }
             }
 
-            // 2) Fallback: sk˙sime trafiù dlaûdicu (Tiles) a z nej occupant budovu.
+            
             if (Physics.Raycast(ray, out var hitT, maxRayDistance, tilesMask, QueryTriggerInteraction.Ignore))
             {
                 var tile = hitT.collider.GetComponentInParent<HexTile>();
