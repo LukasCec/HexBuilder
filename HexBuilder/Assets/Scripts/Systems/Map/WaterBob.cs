@@ -6,13 +6,13 @@ namespace HexBuilder.Systems.Map
     public class WaterBob : MonoBehaviour
     {
         [Header("Wave range (relative to baseY)")]
-        public float minOffsetY = -0.12f;
+        public float minOffsetY = -0.19f;
         public float maxOffsetY = -0.05f;
 
         [Header("Speed (seconds scale)")]
         [Tooltip("Min a max násobite¾ èasu pre Perlin; kadá inštancia si vyre rıchlos medzi nimi.")]
-        public float speedMin = 0.15f;
-        public float speedMax = 0.28f;
+        public float speedMin = 0.6f;
+        public float speedMax = 1.2f;
 
         [Header("Randomness")]
         [Tooltip("Kadı tile dostane náhodnú fázu, aby sa nehıbali rovnako.")]
