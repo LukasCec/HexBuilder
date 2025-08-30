@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using HexBuilder.Systems.Buildings;
 using HexBuilder.Systems.Map;
 using UnityEngine.EventSystems;
+using HexBuilder.Systems.Workers;
 
 namespace HexBuilder.UI
 {
@@ -110,6 +111,25 @@ namespace HexBuilder.UI
 
             if (prodText) prodText.text = prod;
 
+            if (beh != null)
+            {
+                var buf = beh.GetOutputSnapshot();
+                int bw = buf.TryGetValue("wood", out var w) ? w : 0;
+                int bs = buf.TryGetValue("stone", out var s) ? s : 0;
+                int ba = buf.TryGetValue("water", out var a) ? a : 0;
+
+                string bufLine = "Buffer: ";
+                var parts = new System.Collections.Generic.List<string>();
+                if (bw > 0) parts.Add($"{bw} wood");
+                if (bs > 0) parts.Add($"{bs} stone");
+                if (ba > 0) parts.Add($"{ba} water");
+                if (parts.Count == 0) bufLine += "-";
+                else bufLine += string.Join(", ", parts);
+
+               
+                if (prodText) prodText.text = prodText.text + "\n" + bufLine;
+            }
+
             if (statusText)
             {
                 if (beh != null && beh.PausedForUpkeep)
@@ -139,6 +159,55 @@ namespace HexBuilder.UI
             if (!current) return;
             current.Demolish(inventory, refundPercent);
             Hide();
+        }
+
+        public void Show(WorkerAgent w)
+        {
+            current = null; 
+            if (!w)
+            {
+                Hide();
+                return;
+            }
+
+            
+            if (nameText) nameText.text = w.workerName;
+
+           
+            var t = FindClosestTile(w.transform.position);
+            if (coordsText) coordsText.text = t ? $"X:{t.coords.q} Y:{t.coords.r}" : "X:- Y:-";
+
+           
+            if (descText) descText.text = "Hauls resources between producers and warehouses.";
+
+            
+            string cargo = (w.GetCarryingAmount() > 0)
+                ? $"{w.GetCarryingAmount()} {w.GetCarryingId()}"
+                : "-";
+            if (prodText) prodText.text = $"Cargo: {cargo}";
+
+           
+            if (statusText) statusText.text = $"Status: {w.GetStatusText()} | Job: {w.GetJobLabel()}";
+
+            
+            if (demolishButton) demolishButton.interactable = false;
+           
+
+            root.SetActive(true);
+        }
+
+        HexBuilder.Systems.Map.HexTile FindClosestTile(Vector3 pos)
+        {
+            HexBuilder.Systems.Map.HexTile best = null;
+            float bestD = float.MaxValue;
+            foreach (var kv in HexBuilder.Systems.Map.HexMapGenerator.TileIndexByKey)
+            {
+                var tile = kv.Value;
+                if (!tile) continue;
+                float d = (tile.transform.position - pos).sqrMagnitude;
+                if (d < bestD) { bestD = d; best = tile; }
+            }
+            return best;
         }
 
 

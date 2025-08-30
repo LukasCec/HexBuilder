@@ -17,7 +17,7 @@ namespace HexBuilder.Systems.Resources
 
         public event Action OnChanged;
 
-        // ===== Building costs =====
+        
         public bool CanAfford(HexBuilder.Systems.Buildings.BuildingType t)
         {
             if (t == null) return false;
@@ -33,7 +33,7 @@ namespace HexBuilder.Systems.Resources
             NotifyChanged();
         }
 
-        // ===== Move costs (napr. 20% z ceny) =====
+       
         public bool CanAffordMove(HexBuilder.Systems.Buildings.BuildingType t, float factor = 0.2f)
         {
             if (t == null) return false;
@@ -53,7 +53,7 @@ namespace HexBuilder.Systems.Resources
             NotifyChanged();
         }
 
-        // ===== Generic ops =====
+       
         public void Add(string id, int amount)
         {
             if (amount == 0) return;
@@ -100,7 +100,7 @@ namespace HexBuilder.Systems.Resources
             SetAmount("water", water);
         }
 
-        // ===== Caps (pre Warehouse) =====
+       
         public void AddCaps(int addWood, int addStone, int addWater)
         {
             maxWood = Mathf.Max(0, maxWood + addWood);
@@ -117,7 +117,7 @@ namespace HexBuilder.Systems.Resources
             water = Mathf.Clamp(water, 0, maxWater);
         }
 
-        // ===== Upkeep helpers =====
+       
         public bool TryConsume(string id, int amount)
         {
             if (amount <= 0) return true;
@@ -138,7 +138,7 @@ namespace HexBuilder.Systems.Resources
             }
         }
 
-        // Volite¾né – ak máš niekde volanie na balíkovú verziu:
+       
         public bool TryConsume(int needWood, int needStone, int needWater, out string missing)
         {
             missing = null;

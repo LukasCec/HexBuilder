@@ -63,7 +63,7 @@ namespace HexBuilder.Systems.Buildings
             int amount = Mathf.Clamp(baseWood + adjForest * woodPerAdjacentForest, 0, maxPerTick);
             if (amount > 0)
             {
-                inventory.Add("wood", amount);
+                AddToOutput("wood", amount);
                 //if (debugNeighbors) Debug.Log($"[Lumber] +{amount} wood (adjForest={adjForest})");
             }
         }

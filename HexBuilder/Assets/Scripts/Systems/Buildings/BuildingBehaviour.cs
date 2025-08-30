@@ -2,6 +2,7 @@
 using HexBuilder.Systems.Map;
 using HexBuilder.Systems.Resources;
 using HexBuilder.Systems.Core;
+using System.Collections.Generic;
 
 namespace HexBuilder.Systems.Buildings
 {
@@ -25,6 +26,12 @@ namespace HexBuilder.Systems.Buildings
         int upkeepTickCounter = 0;
         public bool PausedForUpkeep { get; private set; }
         public string PauseReason { get; private set; }
+
+        [Header("Output buffer (auto-filled by producers)")]
+        [SerializeField] private Dictionary<string, int> outputBuffer = new Dictionary<string, int>();
+
+        public HexCoords GetCoords() => instance != null ? instance.coords : default;
+        public BuildingInstance GetInstance() => instance;
 
         protected virtual void Awake() { TryResolveRefs(); }
         protected virtual void OnEnable() { TryResolveRefs(); if (ticks) ticks.OnTick += OnTickSafe; }
@@ -84,6 +91,47 @@ namespace HexBuilder.Systems.Buildings
         }
 
         protected abstract void OnTick();
+
+
+        protected void AddToOutput(string id, int amount)
+        {
+            if (amount <= 0 || string.IsNullOrEmpty(id)) return;
+            if (!outputBuffer.TryGetValue(id, out int cur)) cur = 0;
+            outputBuffer[id] = cur + amount;
+        }
+
+        public int GetBufferAmount(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return 0;
+            return outputBuffer.TryGetValue(id, out int v) ? v : 0;
+        }
+
+        public int TakeFromOutput(string id, int maxAmount)
+        {
+            if (string.IsNullOrEmpty(id) || maxAmount <= 0) return 0;
+            if (!outputBuffer.TryGetValue(id, out int have) || have <= 0) return 0;
+            int take = Mathf.Min(have, maxAmount);
+            have -= take;
+            if (have > 0) outputBuffer[id] = have;
+            else outputBuffer.Remove(id);
+            return take;
+        }
+
+        public bool HasAnyOutput()
+        {
+            foreach (var kv in outputBuffer)
+                if (kv.Value > 0) return true;
+            return false;
+        }
+
+        public Dictionary<string, int> GetOutputSnapshot()
+        {
+            // len pre UI (read-only snapshot)
+            var copy = new Dictionary<string, int>();
+            foreach (var kv in outputBuffer) copy[kv.Key] = kv.Value;
+            return copy;
+        }
+
 
         // --- helpers ---
         protected void TryResolveRefs()

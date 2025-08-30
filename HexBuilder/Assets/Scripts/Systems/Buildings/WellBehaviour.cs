@@ -48,7 +48,8 @@ namespace HexBuilder.Systems.Buildings
             }
 
             int amount = Mathf.Clamp(baseWater + adjWater * waterPerAdjacentWater, 0, maxPerTick);
-            if (amount > 0) inventory.Add("water", amount);
+            if (amount > 0)
+                AddToOutput("water", amount);
         }
     }
 }
